@@ -59,6 +59,11 @@ RUN sudo mkdir -p ${FOLDER} && \
 
 
 
+
+# ---------------------------------------------------------------- #
+# rocket
+# ---------------------------------------------------------------- #
+
 # download rocket-tools
 ARG REPO_OWNER=saltedfishlz
 ARG REPO_NAME=rocket-tools
@@ -75,13 +80,11 @@ RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     ./build-rv32ima.sh
 
 
-
 # download rocket-chip
 # release 1.2
 ARG REPO_OWNER=saltedfishlz
 ARG REPO_NAME=rocket-chip
 ENV ROCKET=/rocket-chip
-
 
 WORKDIR /
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \

@@ -60,29 +60,19 @@ RUN sudo mkdir -p ${FOLDER} && \
 
 
 
-
-
-
-
-
 # ---------------------------------------------------------------- #
 # rocket
 # ---------------------------------------------------------------- #
 
-
 # download rocket-tools
-ARG REPO_OWNER=chipsalliance
+ARG REPO_OWNER=saltedfishlz
 ARG REPO_NAME=rocket-tools
-# ARG REPO_HASH=a22d761df4cfef15d27c13f9c913f21fb18ad34a
-# old version
-ARG REPO_HASH=072a21d182ad387a55a1e4b978353efb53ff5841
-ARG RISCV=/opt/riscv
-ENV PATH=${RISCV}:${PATH}
+ENV RISCV=/opt/riscv
+ENV PATH=${RISCV}/bin:${PATH}
 
 WORKDIR /
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     cd ${REPO_NAME} && \
-    git checkout ${REPO_HASH} && \
     git submodule update --init --recursive && \
     export RISCV=$RISCV && \
     export MAKEFLAGS=-j${NCORES} && \
@@ -92,17 +82,15 @@ RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
 
 # download rocket-chip
 # release 1.2
-ARG REPO_OWNER=chipsalliance
+ARG REPO_OWNER=saltedfishlz
 ARG REPO_NAME=rocket-chip
-ARG REPO_HASH=18c91b2
-
+ENV ROCKET=/rocket-chip
 
 WORKDIR /
-# run the tests and then clean everything
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     cd ${REPO_NAME} && \
-    git checkout ${REPO_HASH} && \
     git submodule update --init --recursive && \
+    git checkout master && \
     cd emulator && \
     make -j${NCORES} CONFIG=DefaultRV32Config && \
     make -j${NCORES} CONFIG=DefaultRV32Config run-asm-tests && \
@@ -114,15 +102,9 @@ RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
 
 
 
-
-
-
-
-
 # ---------------------------------------------------------------- #
 # lingua-franca
 # ---------------------------------------------------------------- #
-
 
 ENV ANT_HOME=/opt/apache-ant
 ENV LF="/lingua-franca"
