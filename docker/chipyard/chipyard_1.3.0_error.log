@@ -1,0 +1,37 @@
+riscv64-unknown-elf-objdump --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data rv64mi-p-sbreak > rv64mi-p-sbreak.dump
+make[1]: Leaving directory '/chipyard/toolchains/riscv-tools/riscv-tests/build/isa'
+==>  Installing riscv-tests
+mkdir -p benchmarks
+mkdir -p isa
+/usr/bin/make -C benchmarks -f /chipyard/toolchains/riscv-tools/riscv-tests/build/../benchmarks/Makefile src_dir=/chipyard/toolchains/riscv-tools/riscv-tests/build/../benchmarks XLEN=64
+/usr/bin/make -C isa -f /chipyard/toolchains/riscv-tools/riscv-tests/build/../isa/Makefile src_dir=/chipyard/toolchains/riscv-tools/riscv-tests/build/../isa XLEN=64
+make[1]: Entering directory '/chipyard/toolchains/riscv-tools/riscv-tests/build/benchmarks'
+make[1]: Nothing to be done for 'default'.
+make[1]: Leaving directory '/chipyard/toolchains/riscv-tools/riscv-tests/build/benchmarks'
+make[1]: Entering directory '/chipyard/toolchains/riscv-tools/riscv-tests/build/isa'
+make[1]: Nothing to be done for 'default'.
+make[1]: Leaving directory '/chipyard/toolchains/riscv-tools/riscv-tests/build/isa'
+install -d /chipyard/riscv-tools-install/riscv64-unknown-elf/share/riscv-tests/isa
+install -d /chipyard/riscv-tools-install/riscv64-unknown-elf/share/riscv-tests/benchmarks
+install -p -m 644 `find isa -maxdepth 1 -type f` /chipyard/riscv-tools-install/riscv64-unknown-elf/share/riscv-tests/isa
+install -p -m 644 `find benchmarks -maxdepth 1 -type f` /chipyard/riscv-tools-install/riscv64-unknown-elf/share/riscv-tests/benchmarks
+=>  Starting libgloss build
+==>  Initializing libgloss submodule
+Cloning into '/chipyard/toolchains/libgloss'...
+Submodule path 'toolchains/libgloss': checked out '04b249764b1bc0b784b9f7ff422084f4b53a07ef'
+==>  Configuring libgloss
+checking for riscv64-unknown-elf-gcc... gcc-5
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc-5 accepts -g... yes
+checking for gcc-5 option to accept ISO C89... none needed
+checking for riscv64-unknown-elf-ar... riscv64-unknown-elf-ar
+checking for riscv64-unknown-elf-size... riscv64-unknown-elf-size
+configure: error: in `/chipyard/toolchains/libgloss/build':
+configure: error: The target architecture of the C compiler does not appear to be RISC-V.
+If cross-compiling, specify a target triplet such as '--host=riscv64-unknown-elf'.
+See `config.log' for more details
