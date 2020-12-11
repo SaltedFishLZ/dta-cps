@@ -59,15 +59,30 @@ RUN sudo mkdir -p ${FOLDER} && \
 
 
 
+
+
+
+
+
+
+# ---------------------------------------------------------------- #
+# rocket
+# ---------------------------------------------------------------- #
+
+
 # download rocket-tools
-ARG REPO_OWNER=saltedfishlz
+ARG REPO_OWNER=chipsalliance
 ARG REPO_NAME=rocket-tools
-ENV RISCV=/opt/riscv
-ENV PATH=${RISCV}/bin:${PATH}
+# ARG REPO_HASH=a22d761df4cfef15d27c13f9c913f21fb18ad34a
+# old version
+ARG REPO_HASH=072a21d182ad387a55a1e4b978353efb53ff5841
+ARG RISCV=/opt/riscv
+ENV PATH=${RISCV}:${PATH}
 
 WORKDIR /
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     cd ${REPO_NAME} && \
+    git checkout ${REPO_HASH} && \
     git submodule update --init --recursive && \
     export RISCV=$RISCV && \
     export MAKEFLAGS=-j${NCORES} && \
@@ -75,22 +90,61 @@ RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     ./build-rv32ima.sh
 
 
-
 # download rocket-chip
 # release 1.2
-ARG REPO_OWNER=saltedfishlz
+ARG REPO_OWNER=chipsalliance
 ARG REPO_NAME=rocket-chip
-ENV ROCKET=/rocket-chip
+ARG REPO_HASH=18c91b2
 
 
 WORKDIR /
+# run the tests and then clean everything
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     cd ${REPO_NAME} && \
+    git checkout ${REPO_HASH} && \
     git submodule update --init --recursive && \
-    git checkout master && \
     cd emulator && \
     make -j${NCORES} CONFIG=DefaultRV32Config && \
     make -j${NCORES} CONFIG=DefaultRV32Config run-asm-tests && \
     make -j${NCORES} CONFIG=DefaultRV32Config run-bmark-tests && \
     make -j${NCORES} CONFIG=DefaultRV32Config debug; \
     make clean
+
+
+
+
+
+
+
+
+
+
+# ---------------------------------------------------------------- #
+# lingua-franca
+# ---------------------------------------------------------------- #
+
+
+ENV ANT_HOME=/opt/apache-ant
+ENV LF="/lingua-franca"
+ENV PATH="$LF/bin:$PATH"
+
+WORKDIR  /
+RUN echo "install ant" && \
+    curl --silent --show-error --location --fail --retry 3 \
+        --output /tmp/apache-ant.tar.gz https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.tar.gz &&\
+    tar xf /tmp/apache-ant.tar.gz -C /opt/ && \
+    ln -s /opt/apache-ant-* /opt/apache-ant && \
+    rm -rf /tmp/apache-ant.tar.gz && \
+    /opt/apache-ant/bin/ant -version && \
+    echo "install gradle" && \
+    curl --silent --show-error --location --fail --retry 3 \
+        --output /tmp/gradle.zip https://services.gradle.org/distributions/gradle-5.0-bin.zip && \
+    unzip -d /opt /tmp/gradle.zip && \
+    rm /tmp/gradle.zip && \
+    ln -s /opt/gradle-* /opt/gradle && \
+    /opt/gradle/bin/gradle -version && \
+    echo "download lingua-franca" && \
+    git clone --recursive https://github.com/icyphy/lingua-franca.git && \
+    echo "build lingua-franca compiler" && \
+    update-ca-certificates -f && \
+    ./lingua-franca/bin/build-lfc
