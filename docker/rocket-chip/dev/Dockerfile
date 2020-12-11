@@ -87,12 +87,12 @@ WORKDIR /
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     cd ${REPO_NAME} && \
     git submodule update --init --recursive && \
-    git checkout master \
+    git checkout master && \
     cd emulator && \
     make -j${NCORES} && \
     make -j${NCORES} run-asm-tests && \
     make -j${NCORES} run-bmark-tests && \
-    make -j${NCORES} debug \
+    make -j${NCORES} debug && \
     make -j${NCORES} CONFIG=DefaultRV32Config && \
     make -j${NCORES} CONFIG=DefaultRV32Config run-asm-tests && \
     make -j${NCORES} CONFIG=DefaultRV32Config run-bmark-tests && \
