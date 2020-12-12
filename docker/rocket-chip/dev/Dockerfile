@@ -12,8 +12,13 @@ RUN apt-get update && \
     apt-get install -y sudo && \
     sudo apt-get install -y --no-install-recommends apt-utils && \
     sudo apt-get install -y vim git curl wget unzip autoconf gawk && \
-    sudo apt-get update
+    sudo apt-get install locales && \
+    sudo apt-get update && \
+    locale-gen C.UTF-8 || true
 
+# set up locale
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 
 # chipyard ubuntu dependencies
