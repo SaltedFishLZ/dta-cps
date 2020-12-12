@@ -19,6 +19,6 @@
 
 Shaokai Lin         shaokai@berkeley.edu
 Zheng Liang         zhliang@berkeley.edu
-Ethan Hick          ehicks@berkeley.edu
+Ethan Hicks          ehicks@berkeley.edu
 Josephine Wen       josephine.w@berkeley.edu
 
