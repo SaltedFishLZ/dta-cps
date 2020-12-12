@@ -10,16 +10,19 @@ RUN apt-get update
 
 
 # basic packages
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get install -yqq vim sudo git curl wget unzip autoconf gawk && \
     apt-get update && \
-    apt-get install -yqq dialog && \
-    apt-get install -yqq debconf-utils && \
-    apt-get install -yqq --no-install-recommends apt-utils && \
-    DEBIAN_FRONTEND=noninteractive sudo apt-get install -yqq keyboard-configuration && \
+    apt-get install -yq dialog && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq debconf-utils && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq --no-install-recommends apt-utils && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq keyboard-configuration && \
     DEBIAN_FRONTEND=noninteractive sudo dpkg --configure -a && \
-    apt-get install locales && \
+    DEBIAN_FRONTEND=noninteractive sudo apt-get install -yqq locales && \
     apt-get update && \
     locale-gen C.UTF-8 || true
+
 
 # set up locale
 ENV LANG=C.UTF-8
@@ -40,12 +43,13 @@ RUN sudo apt-get update && \
     sudo apt-get install -yqq sbt
 
 
+
 # ubuntu 16.04 cannot find package python3.6
-RUN sudo apt-get install -yqq texinfo gengetopt libexpat1-dev libusb-dev libncurses5-dev cmake perl-doc && \
+RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -yqq texinfo gengetopt libexpat1-dev libusb-dev libncurses5-dev cmake perl-doc && \
     echo "deps for poky" && \
-    sudo apt-get install -yqq python3.6 patch diffstat texi2html texinfo subversion chrpath && \
-    echo "deps for qemu" && \
-    DEBIAN_FRONTEND=noniteractive sudo apt-get install -yqq libgtk-3-dev gettext && \
+    DEBIAN_FRONTEND=noninteravtive sudo apt-get install -yqq python3.6 patch diffstat texi2html texinfo subversion chrpath && \
+    # echo "deps for qemu" && \
+    # DEBIAN_FRONTEND=noniteractive sudo apt-get install -yqq libgtk-3-dev gettext && \
     echo "deps for firemarshal" && \
     DEBIAN_FRONTEND=noninteractive sudo apt-get install -yqq python3-pip python3.6-dev rsync libguestfs-tools expat ctags && \
     echo "install DTC" && \
@@ -53,7 +57,7 @@ RUN sudo apt-get install -yqq texinfo gengetopt libexpat1-dev libusb-dev libncur
     sudo apt-get update 
 
 
-
+RUN fucku
 
 
 # download and install verilator
