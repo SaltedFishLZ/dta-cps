@@ -5,31 +5,34 @@ ARG NCORES=16
 
 # config apt source according to IP location
 ARG IP_LOCATION="US"
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 
 
 
 # basic packages
-RUN apt-get install -y vim sudo git curl wget unzip autoconf gawk && \
+RUN apt-get install -yq vim sudo git curl wget unzip autoconf gawk && \
     apt-get update && \
-    apt install debconf-utils && \
-    DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration && \
+    apt-get install -yq dialog && \
+    apt-get install -yq debconf-utils apt-utils && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y keyboard-configuration && \
+    dpkg --configure -a && \
     echo "need to install apt-transport-https for some distributions." && \
     echo "non-official apt packages need it" && \
-    apt-get install -y apt-transport-https ca-certificates
+    apt-get install -yq apt-transport-https ca-certificates
 
 
 # chipyard ubuntu dependencies
 # this part comes from the Chipyard tutorial
-RUN sudo apt-get install -y build-essential bison flex libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev && \
-    sudo apt-get install -y gcc-5 g++-5 openjdk-8-jre openjdk-8-jdk python python3
+RUN sudo apt-get install -yq build-essential bison flex libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev && \
+    sudo apt-get install -yq gcc-5 g++-5 openjdk-8-jre openjdk-8-jdk python python3
 
 
 # install sbt: https://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html
 RUN echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
 RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
 RUN sudo apt-get update && \
-    sudo apt-get install -y sbt
+    sudo apt-get install -yq sbt
 
 
 # ubuntu 16.04 cannot find package python3.6
@@ -37,11 +40,11 @@ RUN sudo apt-get install -y texinfo gengetopt libexpat1-dev libusb-dev libncurse
     echo "deps for poky" && \
     sudo apt-get install -y python3.6 patch diffstat texi2html texinfo subversion chrpath && \
     echo "deps for qemu" && \
-    sudo apt-get install -y libgtk-3-dev gettext && \
+    DEBIAN_FRONTEND=noniteractive sudo apt-get install -y libgtk-3-dev gettext && \
     echo "deps for firemarshal" && \
-    sudo apt-get install -y python3-pip python3.6-dev rsync libguestfs-tools expat ctags && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3.6-dev rsync libguestfs-tools expat ctags && \
     echo "install DTC" && \
-    sudo apt-get install -y device-tree-compiler && \
+    DEBIAN_FRONTEDN=noninteractive apt-get install -y device-tree-compiler && \
     sudo apt-get update 
 
 
@@ -101,10 +104,10 @@ WORKDIR /
 RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
     cd ${REPO_NAME} && \
     git checkout ${REPO_HASH} && \
-    ./scripts/init-submodules-no-riscv-tools.sh && \
-    export MAKEFLAGS=-j${NCORES} && \
-    export CC=gcc-5 CXX=g++-5  && \
-    ./scripts/build-toolchains.sh riscv-tools
+    ./scripts/init-submodules-no-riscv-tools.sh
+#     export MAKEFLAGS=-j${NCORES} && \
+#     export CC=gcc-5 CXX=g++-5  && \
+#     ./scripts/build-toolchains.sh riscv-tools
 
 
 # WORKDIR /${REPO_NAME}
