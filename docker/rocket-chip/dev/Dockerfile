@@ -9,11 +9,11 @@ ARG NCORES=16
 ARG IP_LOCATION="US"
 
 RUN apt-get update && \
-    apt-get install -y sudo && \
-    sudo apt-get install -y --no-install-recommends apt-utils && \
-    sudo apt-get install -y vim git curl wget unzip autoconf gawk && \
-    sudo apt-get install locales && \
-    sudo apt-get update && \
+    apt-get install -yqq sudo && \
+    apt-get install -yqq --no-install-recommends apt-utils && \
+    apt-get install -yqq vim git curl wget unzip autoconf gawk && \
+    apt-get install locales && \
+    apt-get update && \
     locale-gen C.UTF-8 || true
 
 # set up locale
@@ -23,23 +23,23 @@ ENV LC_ALL=C.UTF-8
 
 # chipyard ubuntu dependencies
 # this part comes from the Chipyard tutorial
-RUN sudo apt-get install -y autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev && \
-    sudo apt-get install -y libusb-1.0-0-dev gawk build-essential bison flex texinfo gperf libtool && \
-    sudo apt-get install -y patchutils bc zlib1g-dev device-tree-compiler pkg-config && \
-    sudo apt-get install -y libexpat-dev libfl-dev && \
-    sudo apt-get install -y build-essential bison flex libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev && \
-    sudo apt-get install -y gcc-5 g++-5 openjdk-8-jre openjdk-8-jdk python python3 && \
+RUN sudo apt-get install -yqq autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev && \
+    sudo apt-get install -yqq libusb-1.0-0-dev gawk build-essential bison flex texinfo gperf libtool && \
+    sudo apt-get install -yqq patchutils bc zlib1g-dev device-tree-compiler pkg-config && \
+    sudo apt-get install -yqq libexpat-dev libfl-dev && \
+    sudo apt-get install -yqq build-essential bison flex libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev && \
+    sudo apt-get install -yqq gcc-5 g++-5 openjdk-8-jre openjdk-8-jdk python python3 && \
     echo "need to install apt-transport-https for some distributions. Sbt needs it" && \
-    sudo apt-get install -y apt-transport-https ca-certificates && \
-    sudo apt-get install -y texinfo gengetopt libexpat1-dev libusb-dev libncurses5-dev cmake perl-doc && \
-    sudo apt-get install -y python3.6 patch diffstat texi2html texinfo subversion chrpath && \
-    sudo apt-get install -y device-tree-compiler && \
+    sudo apt-get install -yqq apt-transport-https ca-certificates && \
+    sudo apt-get install -yqq texinfo gengetopt libexpat1-dev libusb-dev libncurses5-dev cmake perl-doc && \
+    sudo apt-get install -yqq python3.6 patch diffstat texi2html texinfo subversion chrpath && \
+    sudo apt-get install -yqq device-tree-compiler && \
     sudo apt-get update && \
     echo "install sbt: https://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html" && \
     echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list && \
     curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add && \
     sudo apt-get update && \
-    sudo apt-get install -y sbt
+    sudo apt-get install -yqq sbt
 
 
 
