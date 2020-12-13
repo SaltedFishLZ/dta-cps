@@ -24,8 +24,8 @@ echo "non-official apt packages need it" && \
 apt-get install -yqq apt-transport-https ca-certificates
 
 
-echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
-curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
+echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list && \
+curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add && \
 sudo apt-get update && \
 sudo apt-get install -yqq sbt
 
@@ -68,8 +68,8 @@ CHIPYARD_USE_LOCAL_PACKAGE=True
 REPO_OWNER=ucb-bar
 REPO_NAME=chipyard
 
-# 1.1.0
-REPO_HASH=7a6124d462b211f7123b1307a27aa125cf90134b
+# 1.2.0
+REPO_HASH=32c957ce930ad283402810ddd52942d28524c3c1
 
 
 git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \

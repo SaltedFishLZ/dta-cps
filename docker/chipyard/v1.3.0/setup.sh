@@ -68,8 +68,8 @@ CHIPYARD_USE_LOCAL_PACKAGE=True
 REPO_OWNER=ucb-bar
 REPO_NAME=chipyard
 
-# 1.1.0
-REPO_HASH=7a6124d462b211f7123b1307a27aa125cf90134b
+# 1.3.0
+REPO_HASH=c576a7e76717376b7a2cbbc0a531f51382ff87f1
 
 
 git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
