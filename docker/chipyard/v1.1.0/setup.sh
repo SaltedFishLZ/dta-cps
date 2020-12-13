@@ -2,18 +2,20 @@
 
 # when necessary, please use sudo
 
+export NCORES=16
+
 apt-get update
 
 apt-get install -yqq vim sudo git curl wget unzip autoconf gawk && \
 apt-get update && \
-apt-get install -yq dialog && \
+apt-get install -yqq dialog && \
 apt-get install -yqq debconf-utils && \
 apt-get install -yqq --no-install-recommends apt-utils && \
 apt-get install -yqq keyboard-configuration && \
 sudo dpkg --configure -a && \
 sudo apt-get install -yqq locales && \
-apt-get update && \
-locale-gen C.UTF-8 || true
+apt-get update
+
 
 sudo apt-get install -yqq build-essential bison flex libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev && \
 sudo apt-get install -yqq gcc-5 g++-5 openjdk-8-jre openjdk-8-jdk python python3 && \
@@ -31,13 +33,13 @@ sudo apt-get install -yqq sbt
 
 sudo apt-get install -yqq texinfo gengetopt libexpat1-dev libusb-dev libncurses5-dev cmake perl-doc && \
 echo "deps for poky" && \
-DEBIAN_FRONTEND=noninteravtive sudo apt-get install -yqq python3.6 patch diffstat texi2html texinfo subversion chrpath && \
-# echo "deps for qemu" && \
-# DEBIAN_FRONTEND=noniteractive sudo apt-get install -yqq libgtk-3-dev gettext && \
+sudo apt-get install -yqq python3.6 patch diffstat texi2html texinfo subversion chrpath && \
+echo "deps for qemu" && \
+sudo apt-get install -yqq libgtk-3-dev gettext && \
 echo "deps for firemarshal" && \
 sudo apt-get install -yqq python3-pip python3.6-dev rsync libguestfs-tools expat ctags && \
 echo "install DTC" && \
-DEBIAN_FRONTEDN=noninteractive sudo apt-get install -yqq device-tree-compiler && \
+sudo apt-get install -yqq device-tree-compiler && \
 sudo apt-get update
 
 
@@ -57,14 +59,15 @@ autoconf && ./configure && \
 make -j${NCORES} && \
 make test && \
 sudo make install
-
+cd /
 
 
 # download and install chipyard
 # using too many cores may cause memory overflow, be careful
-ARG CHIPYARD_USE_LOCAL_PACKAGE=True
-ARG REPO_OWNER=ucb-bar
-ARG REPO_NAME=chipyard
+CHIPYARD_USE_LOCAL_PACKAGE=True
+REPO_OWNER=ucb-bar
+REPO_NAME=chipyard
+
 # 1.1.0
 ARG REPO_HASH=7a6124d462b211f7123b1307a27aa125cf90134b
 
@@ -75,10 +78,7 @@ git checkout ${REPO_HASH} && \
 ./scripts/init-submodules-no-riscv-tools.sh
 
 
-
-
-
+# incompatible with export CC=gcc-5 CXX=g++-5
 export MAKEFLAGS=-j${NCORES} && \
-export CC=gcc-5 CXX=g++-5  && \
 ./scripts/build-toolchains.sh riscv-tools
 
