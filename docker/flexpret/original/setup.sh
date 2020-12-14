@@ -22,4 +22,6 @@ REPO_NAME=flexpret
 
 git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
 cd flexpret && \
-git checkout RTAS14
+git checkout RTAS14 && \
+make run && \
+python2 run-tests.py
