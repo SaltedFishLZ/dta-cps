@@ -17,8 +17,5 @@
 
 ## Authors
 
-Shaokai Lin         shaokai@berkeley.edu
-Zheng Liang         zhliang@berkeley.edu
-Ethan Hicks          ehicks@berkeley.edu
-Josephine Wen       josephine.w@berkeley.edu
+Shaokai Lin, Zheng Liang, Ethan Hick, Josephine Wen
 
