@@ -92,7 +92,7 @@ def determine_exec_time(arr):
     """
     return np.random.choice(arr)
 
-def heap_func(row, t_start = 1, t_end = 4):
+def heap_func(row, time, t_start = 1, t_end = 4):
     """
     function to create the heap object and put it on the heap
 
@@ -104,22 +104,22 @@ def heap_func(row, t_start = 1, t_end = 4):
     """
     exec_time = determine_exec_time(row.to_numpy()[t_start:t_end]) # Dont want period (index = 0) nor time (index = 4)
 
-    deadline = row['period'] + row["time"]
+    deadline = row['period'] + time
     heap_item = {
         "period": row['period'],
-        "start_time": row["time"],
+        "start_time": time,
         "end_time": None,
         "deadline": deadline,
         "Error": False,
         "exec_time": exec_time,
         "ticks_remaining": exec_time,
-        "Name": "start:{}-period:{}-deadline{}".format(row["time"], row['period'], deadline)
+        "Name": "start:{}-period:{}-deadline{}".format(time, row['period'], deadline)
     }
 
     hq.heappush(heap, CompareWord(deadline, heap_item))
 
 
-def run_scheduling(max_time, df):
+def run_scheduling(max_time, df, t_start = 1, t_end = 4):
     """
     The scheduling loop, to be plotted in a gantt chart
 
@@ -133,12 +133,12 @@ def run_scheduling(max_time, df):
 
     for tick in range(max_time): # time loop
         incoming = incoming_task(tick, df)
-        incoming["time"] = tick * np.ones(len(incoming), dtype=int)
-        incoming = incoming
+        # incoming["time"] = tick * np.ones(len(incoming), dtype=int)
+        # incoming = incoming
 
         # Incoming tasks
         if len(incoming) != 0:
-            incoming.apply(heap_func, axis = 1)
+            incoming.apply(heap_func, axis = 1, args = (tick, t_start, t_end))
 
         # # Outgoing Task -- EDF can only pop one task at a time, but can add more than one task
         if (len(heap) > 0):
@@ -147,7 +147,8 @@ def run_scheduling(max_time, df):
             print("nothing to pop as its zero")
             continue
 
-        if tick > item.getValue()['deadline']:
+        if tick-1 > item.getValue()['deadline']:
+            print(tick, item.getValue()['deadline'])
             item.setError()
 
         if item.getValue()["ticks_remaining"] == 0:
@@ -175,20 +176,20 @@ def plot_gantt(df):
     plty["Deadline"] = df["deadline"]
     for i, row in plty.iterrows():
         tupe = (row['Start'], row['Finish'] - row['Start'])
-        ax_gnt.broken_barh([tupe], (i, 3), facecolors = 'tab:red' if row['Resource'] == 'Critical' else 'tab:blue')
+        ax_gnt.broken_barh([tupe], (i, 3), facecolors = '#FDB515' if row['Resource'] == 'Critical' else '#003262')
         ax_gnt.broken_barh([tupe], (i+1, 3), facecolors = 'white')
 
     ax_gnt.set_yticks([ir + .5 for ir  in range(len(plty))])
     ax_gnt.set_yticklabels(plty["Task"].to_numpy())
 
-    red_patch = mpatches.Patch(color='red', label='Task that failed to meet its deadline')
-    blue_patch = mpatches.Patch(color='blue', label='Task that met its deadline')
+    red_patch = mpatches.Patch(color='#FDB515', label='Task that failed to meet its deadline')
+    blue_patch = mpatches.Patch(color='#003262', label='Task that met its deadline')
 
     ax_gnt.grid(True)
     plt.legend(handles = [red_patch, blue_patch])
     plt.show()
 
-def main(path_to_csv = "scheduler/EDF_data.csv", TICKS = 40):
+def main(path_to_csv = "scheduler/EDF_data.csv", TICKS = 250):
     """
     main function to run everything. I think this is what was wanted?
 
