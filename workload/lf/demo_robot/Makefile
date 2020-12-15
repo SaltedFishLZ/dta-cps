@@ -1,7 +1,6 @@
 
 XLEN ?= 32
 
-
 src_dir = ../../../
 
 RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
@@ -31,7 +30,21 @@ demo_robot.dump: demo_robot.riscv
 demo_robot.dump.annot: demo_robot.riscv
 	$(RISCV_OBJDUMP) -S $< > $@
 
-all: demo_robot.riscv demo_robot.dump demo_robot.dump.annot
+
+demo_robot_printf.riscv: $(wildcard ./*.c) $(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
+	$(RISCV_GCC) $(incs) $(RISCV_GCC_OPTS) -D PRINTF $(RISCV_LINK_OPTS) -o $@ \
+	$(wildcard ./*.c) \
+	$(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
+
+demo_robot_printf.dump: demo_robot_printf.riscv
+	$(RISCV_OBJDUMP) $< > $@
+
+demo_robot_printf.dump.annot: demo_robot_printf.riscv
+	$(RISCV_OBJDUMP) -S $< > $@
+
+
+all: demo_robot.riscv demo_robot.dump demo_robot.dump.annot \
+	 demo_robot_printf.riscv demo_robot_printf.dump demo_robot_printf.dump.annot
 
 clean:
 	-rm -rf *.riscv *.dump *.dump.annot

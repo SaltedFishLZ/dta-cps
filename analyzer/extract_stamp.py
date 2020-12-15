@@ -25,8 +25,11 @@ def extract_stamp(filename, stamp_id=0):
     _f = open(filename, "r")
     line_count = 0
 
-    start_mark = "magic_start_stamp({})".format(stamp_id)
-    end_mark = "magic_end_stamp({})".format(stamp_id)
+    # start_mark = "magic_start_stamp({})".format(stamp_id)
+    # end_mark = "magic_end_stamp({})".format(stamp_id)
+
+    start_mark = "# 149a{0:04x} <buf.".format(stamp_id + 1)
+    end_mark = "# 249a{0:04x} <buf.".format(stamp_id + 1)
 
     start_stamp = None
     end_stamp = None

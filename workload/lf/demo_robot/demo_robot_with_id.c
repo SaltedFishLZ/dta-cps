@@ -4,6 +4,14 @@
 #include "util.h"
 #define NUMBER_OF_FEDERATES 1
 #include "core/reactor.c"
+
+
+#ifndef PRINTF
+#define printf(fmt, ...) ; // dummy
+#endif
+
+
+
 // =============== START reactor class Controller
 #line 56 "file:/lf-flexpret-scripts/lf/demo_2/demo_robot_with_id.lf"
 typedef struct {

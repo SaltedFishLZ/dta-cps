@@ -83,8 +83,9 @@ def log_parse(filename, start_stamp, end_stamp):
             elif (end_stamp in line):
                 # state transfer
                 end_count += 1
-                raise ValueError("Cannot accpet end_stamp at {}, line{}".format(
-                        state, line_count))
+                if (int(valid) > 0):
+                    raise ValueError("Cannot accpet end_stamp at {}, line:{}".format(
+                                     state, line_count))
             else:
                 pass
         
@@ -94,8 +95,9 @@ def log_parse(filename, start_stamp, end_stamp):
             # match start stamp
             if (start_stamp in line):
                 # state transfer
-                raise ValueError("Cannot accpet start_stamp at {}, line{}".format(
-                        state, line_count))
+                if (int(valid) > 0):
+                    raise ValueError("Cannot accpet start_stamp at {}, line:{}".format(
+                                     state, line_count))
 
             # match end stamp
             elif (end_stamp in line):
