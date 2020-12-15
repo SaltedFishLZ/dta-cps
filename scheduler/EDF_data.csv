@@ -1,0 +1,5 @@
+task-id,period,exec-time-worst,exec-time-average,exec-time-best
+1,9,4,2,1
+2,10,4,4,2
+3,13,5,5,3
+4,14,3,3,3
