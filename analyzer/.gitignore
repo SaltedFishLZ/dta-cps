@@ -2,8 +2,8 @@
 test-data/
 
 # local experiment daya
-expdir
-experiments/
+!expdir
+# experiments/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
