@@ -64,5 +64,8 @@ SECTIONS
   _end = .;
   /* remove the old style symbol */
   /* end = .; */
+
+  /* magic stamp */
+  magic_stamp = 0x8F000000;
 }
 

@@ -6,6 +6,7 @@
 extern void setStats(int enable);
 
 #include <stdint.h>
+#include <sys/signal.h>
 
 #define static_assert(cond) switch(0) { case 0: case !!(long)(cond): ; }
 
@@ -98,15 +99,41 @@ static uintptr_t insn_len(uintptr_t pc)
  * Questions:
  * can we disable -g compiling flag?
  */
+
+
+/*
+ * currently, to prevent gcc from optimizing out the symbols
+ * in annotations, we use external symbol in linker script
+ * since linker is the last step
+ * Note: we use stamp +1 to force all stamp id to be translated
+ * into an addi instruction, which is convinient for processing
+ */
+
 #ifndef NO_MAGIC_STAMP
-#define magic_stamp_addr (volatile uint32_t *)0x8F000000
-// write 0x8F_id_149A
+extern volatile uint32_t magic_stamp;
+// notice the valid id range !!!
+// write (0x149A0000 | (stamp_id + 1))
 #define magic_start_stamp(stamp_id) \
-  *magic_stamp_addr = ((stamp_id & 0x00FF0000) | 0x149a);
-// write 0x8F_id_249a
+  magic_stamp = (0x149A0000 | (stamp_id + 1));
+// write (0x149A0000 | (stamp_id + 1))
 #define magic_end_stamp(stamp_id) \
-  *magic_stamp_addr = ((stamp_id & 0x00FF0000) | 0x249a);
+  magic_stamp = (0x249A0000 | (stamp_id + 1));
 #else
 #define magic_start_stamp(stamp_id) ; // do nothing
 #define magic_end_stamp(stamp_id)  ; // do nothing
 #endif
+
+
+
+// #ifndef NO_MAGIC_STAMP
+// #define magic_stamp_addr (volatile uint32_t *)0x8F000000
+// // write 0x8F_id_149A
+// #define magic_start_stamp(stamp_id) \
+//   *magic_stamp_addr = ((stamp_id & 0x00FF0000) | 0x149a);
+// // write 0x8F_id_249a
+// #define magic_end_stamp(stamp_id) \
+//   *magic_stamp_addr = ((stamp_id & 0x00FF0000) | 0x249a);
+// #else
+// #define magic_start_stamp(stamp_id) ; // do nothing
+// #define magic_end_stamp(stamp_id)  ; // do nothing
+// #endif
