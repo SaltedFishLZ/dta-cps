@@ -78,9 +78,9 @@ int main( int argc, char* argv[] )
 #endif
 
   // Do the filter
-  // setStats(1);
+  setStats(1);
   median( DATA_SIZE, input_data, results_data );
-  // setStats(0);
+  setStats(0);
 
   // Check the results
   return verify( DATA_SIZE, results_data, verify_data );

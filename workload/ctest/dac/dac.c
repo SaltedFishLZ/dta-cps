@@ -11,7 +11,7 @@ volatile uint8_t * driver_out = (volatile uint8_t *)0x82000000;
 
 int main()
 {
-    // setStats(1);
+    setStats(1);
     for (int i = 0; i < ITERS; i++) {
 magic_start_stamp(1)
         // begin
@@ -27,6 +27,6 @@ magic_start_stamp(1)
         // end
 magic_end_stamp(1)
     }
-    // setStats(0);
+    setStats(0);
     return 0;
 }

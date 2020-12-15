@@ -20,18 +20,26 @@ RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes -
 
 incs  += -I$(src_dir)lib/common
 
-median.riscv: $(wildcard ./*.c) $(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
+dac.riscv: $(wildcard ./*.c) $(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
 	$(RISCV_GCC) $(incs) $(RISCV_GCC_OPTS) $(RISCV_LINK_OPTS) -o $@ \
 	$(wildcard ./*.c) \
 	$(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
 
-median.dump: median.riscv
+dac.nostamp.riscv: $(wildcard ./*.c) $(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
+	$(RISCV_GCC) $(incs) $(RISCV_GCC_OPTS) -D NO_MAGIC_STAMP $(RISCV_LINK_OPTS) -o $@ \
+	$(wildcard ./*.c) \
+	$(wildcard $(src_dir)lib/common/*.c) $(wildcard $(src_dir)lib/common/*.S)
+
+dac.dump: dac.riscv
 	$(RISCV_OBJDUMP) $< > $@
 
-median.dump.annot: median.riscv
+dac.dump.annot: dac.riscv
 	$(RISCV_OBJDUMP) -S $< > $@
 
-all: median.riscv median.dump median.dump.annot
+dac.nostamp.dump.annot: dac.nostamp.riscv
+	$(RISCV_OBJDUMP) -S $< > $@
+
+all: dac.riscv dac.nostamp.riscv dac.dump dac.dump.annot dac.nostamp.dump.annot
 
 clean:
 	-rm -rf *.riscv *.dump *.dump.annot
