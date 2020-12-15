@@ -32,8 +32,8 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // RISC-V Bare Metal Support
-// #include "bare_metal.c"
-// #include "spike_util.c"
+#include "bare_metal.c"
+#include "spike_util.c"
 
 #include "reactor_common.c"
 //#include <assert.h>
@@ -328,7 +328,14 @@ void request_stop() {
     stop_tag.microstep++;
 }
 
+// Mechanism to wait for a connection from GDB
+volatile int wait = 1;
+volatile int returned = -1;
+
 int main(int argc, char* argv[]) {
+    // Spin wait
+    while (wait);
+
     // Invoke the function that optionally provides default command-line options.
     __set_default_command_line_options();
 
@@ -349,12 +356,17 @@ int main(int argc, char* argv[]) {
             while (next() != 0);
         }
         termination();
-        // __spike_return(0);
-        return 0;
+        __spike_return(0);
+
+        returned = 0;
     } else {
         // printf("DEBUG: invoking termination.\n");
         termination();
-        // __spike_return(1);
-        return -1;
+        __spike_return(1);
+
+        returned = 1;
     }
+
+    done:
+        while(!wait);
 }
