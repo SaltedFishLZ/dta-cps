@@ -11,9 +11,9 @@ volatile uint8_t * driver_out = (volatile uint8_t *)0x82000000;
 
 int main()
 {
-    // setStats(1);
+    setStats(1);
     for (int i = 0; i < ITERS; i++) {
-magic_start_stamp(0)
+magic_start_stamp(1)
         // begin
         uint8_t input = *sensor_in;
         float data = (float)(input) / 256.0;
@@ -25,8 +25,8 @@ magic_start_stamp(0)
             *driver_out = 50;
         }
         // end
-magic_end_stamp(0)
+magic_end_stamp(1)
     }
-    // setStats(0);
+    setStats(0);
     return 0;
 }
