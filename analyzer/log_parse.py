@@ -21,6 +21,7 @@ def log_parse(filename, start_stamp, end_stamp):
     assert type(start_stamp) == str, TypeError
     assert type(end_stamp) == str, TypeError
 
+    print("\n\n")
     print("=" * 64)
     print("Extracing [" + filename + "]")
     print("=" * 64)

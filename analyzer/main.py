@@ -16,7 +16,7 @@ from timing import get_execution_durations
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", metavar="DIR", type=str,
-                        help="folder path for")
+                        help="folder path for binary, asm and trace")
     parser.add_argument("name", metavar='N', type=str,
                         help="binary name, assume other files have the same name with different suffixs")
     parser.add_argument("--sid", nargs='+', type=int,
@@ -29,8 +29,6 @@ if __name__ == "__main__":
                         help="disable printing results")
 
     args = parser.parse_args()
-
-    print(args.sid)
 
 
     prefix = os.path.join(args.dir, args.name)
@@ -47,7 +45,8 @@ if __name__ == "__main__":
         # get annotations
         annot_fpath = "{}.dump.annot".format(prefix)
         (start_stamp, end_stamp) = extract_stamp(annot_fpath, stamp_id=_sid)
-        print("(start_stamp, end_stamp) = ", (start_stamp, end_stamp))
+        if (args.quiet is not True):
+            print("(start_stamp, end_stamp) = ", (start_stamp, end_stamp))
 
         if (start_stamp is None or
             end_stamp is None):
@@ -67,8 +66,8 @@ if __name__ == "__main__":
                 print(execution_durations)
 
             if (args.dump is True):
-                print(args.dump)
-                dump_fpath = "{}.sid{}.pkl".format(prefix, _sid)
+                # print(args.dump)
+                dump_fpath = "{}.sid_{}.pkl".format(prefix, _sid)
                 _dump_f = open(dump_fpath, "wb")
                 pickle.dump(execution_durations, _dump_f)
                 _dump_f.close()
