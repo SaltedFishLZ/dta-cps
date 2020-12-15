@@ -30,12 +30,12 @@ class CompareWord:
         if self.deadline != other.deadline:
             return self.deadline < other.deadline
 
-        # Same deadline -> Choose the fewest ticks remaining
+        # Same deadline -> Choose the fewest ticks remaining 
         elif self.deadline == other.deadline and self.value["ticks_remaining"] != other.value["ticks_remaining"]:
             return self.value["ticks_remaining"] < other.value["ticks_remaining"]
 
         # Same deadline and same ticks remaining -> choose the one that started sooner
-        else:
+        else: 
             return self.value["start_time"] < other.value["start_time"]
 
 
@@ -133,8 +133,6 @@ def run_scheduling(max_time, df, t_start = 1, t_end = 4):
 
     for tick in range(max_time): # time loop
         incoming = incoming_task(tick, df)
-        # incoming["time"] = tick * np.ones(len(incoming), dtype=int)
-        # incoming = incoming
 
         # Incoming tasks
         if len(incoming) != 0:
@@ -146,16 +144,16 @@ def run_scheduling(max_time, df, t_start = 1, t_end = 4):
         else:
             print("nothing to pop as its zero")
             continue
-
+        
+        item.setTime(item.getValue()["ticks_remaining"] - 1)
         if tick-1 > item.getValue()['deadline']:
-            print(tick, item.getValue()['deadline'])
+            # print(tick, item.getValue()['deadline'])
             item.setError()
 
         if item.getValue()["ticks_remaining"] == 0:
-            item.setFinishTime(tick)
+            item.setFinishTime(tick+1)
             gantt_chart.loc[len(gantt_chart)] = item.getValue()
         else:
-            item.setTime(item.getValue()["ticks_remaining"] - 1)
             hq.heappush(heap, CompareWord(item.getTime(), item.getValue()))
     return gantt_chart
 
