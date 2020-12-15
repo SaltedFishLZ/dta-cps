@@ -1,6 +1,9 @@
 # local test-data
 test-data/
 
+# local experiment daya
+experiments
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
