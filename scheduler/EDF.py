@@ -7,10 +7,19 @@ import matplotlib.patches as mpatches
 
 import plotly.figure_factory as ff 
 
-ROWS = 60
 
 # This is because I am storing weird stuff in the dictionary
 class CompareWord:
+    """
+    Class to implement a comparator to the incoming tasks.
+
+    Because this is EDF, we obviously prioritize the deadline first, but then
+    some decisions must be made. Here, to brake ties the following rank is implemented:
+        1) deadline
+        2) fewest ticks remaining in the task
+        3) When the task was put in the scheduler
+    """
+
     def __init__(self , deadline, value):
         self.deadline = deadline
         self.value = value
@@ -43,6 +52,10 @@ class CompareWord:
         else:
             return self.value["start_time"] > other.value["start_time"]
 
+    """
+    Basic class getter and setters to directly modify the value object 
+    """
+
     def getTime(self):
         return self.deadline
     
@@ -59,26 +72,37 @@ class CompareWord:
         self.value["end_time"] = number
 
 
-df = pd.read_csv("EDF_data.csv", index_col="task-id")
-heap = []
-time = 0
-
-
-ex_percent = np.sum(df['exec-time-worst'] / df['period'])
-print("this will always work if this is less than one:\t", ex_percent)
-
 # function to determing what is coming
-def incoming_task(time):
+def incoming_task(time, df):
+    """
+    Function to determing whats coming this tick. 
+    When the mod is zero, the period is such that there is an incoming task to the scheduler
+    """
     return df[time % df['period'] == 0]
     
 
 def determine_exec_time(arr):
-    # best, worst, average is not equal to 33% each time (not for task-id 1 anyway)
-    # but it should be close enough
+    """
+    best, worst, average is not equal to 33% each time (not for task-id 1 anyway)
+    but it should be close enough
+
+    params - arr - 1d array of numbers
+    returns - number - a single number chosen at random to act as the number of ticks needed to complete the task
+
+    """
     return np.random.choice(arr)
 
-def heap_func(row):
-    exec_time = determine_exec_time(row.to_numpy()[1:4]) # Dont want period (index = 0) nor time (index = 4)
+def heap_func(row, t_start = 1, t_end = 4):
+    """
+    function to create the heap object and put it on the heap
+
+    params - row - with objects period, time, and a way to derive a numpy array for worst, average, and best execution times
+        to the be chosen
+    
+    returns - void? - meant to be only in a pandas apply function
+
+    """
+    exec_time = determine_exec_time(row.to_numpy()[t_start:t_end]) # Dont want period (index = 0) nor time (index = 4)
 
     deadline = row['period'] + row["time"]
     heap_item = {
@@ -95,12 +119,20 @@ def heap_func(row):
     hq.heappush(heap, CompareWord(deadline, heap_item))
 
 
-def run_scheduling(max_time):
+def run_scheduling(max_time, df):
+    """
+    The scheduling loop, to be plotted in a gantt chart
+
+    params - max time - number of time ticks this is supposed to run for
+           df - dataframe of task id, period, worst, average, and best execution times
+    
+    returns df - a dataframe with the columns period, start time, end time, deadline, error, execution time, ticks remaining, and name of the task
+    """
 
     gantt_chart = pd.DataFrame(columns=["period", "start_time", "end_time", "deadline", "Error", "exec_time", "ticks_remaining", "Name"])
 
     for tick in range(max_time): # time loop
-        incoming = incoming_task(tick)
+        incoming = incoming_task(tick, df)
         incoming["time"] = tick * np.ones(len(incoming), dtype=int)
         incoming = incoming
 
@@ -115,7 +147,7 @@ def run_scheduling(max_time):
             print("nothing to pop as its zero")
             continue
 
-        if item.getValue()["deadline"] < tick:
+        if tick > item.getValue()['deadline']:
             item.setError()
 
         if item.getValue()["ticks_remaining"] == 0:
@@ -126,45 +158,57 @@ def run_scheduling(max_time):
             hq.heappush(heap, CompareWord(item.getTime(), item.getValue()))
     return gantt_chart
 
-gantt_chart = run_scheduling(ROWS)
+def plot_gantt(df):
+    """
+    The code to plot and create a Gantt Chart of the data. 
 
-fig, ax_gnt = plt.subplots(figsize = (12, 8))
-plty = pd.DataFrame(columns = ["Task", "Start", "Finish", "Resource"])
-plty["Resource"] = ["Critical" if x else "Not Critical" for x in gantt_chart['Error']]
-plty['Task'] = gantt_chart["Name"]
-plty['Start'] = gantt_chart["start_time"]
-plty['Finish'] = gantt_chart["end_time"]
-plty["Deadline"] = gantt_chart["deadline"]
+    params - df - the specific output of run_scheduling
+
+    returns - void? - a matplotlib figure is generated, but besides that nothing is generated. 
+    """
+    fig, ax_gnt = plt.subplots(figsize = (12, 8))
+    plty = pd.DataFrame(columns = ["Task", "Start", "Finish", "Resource"])
+    plty["Resource"] = ["Critical" if x else "Not Critical" for x in df['Error']]
+    plty['Task'] = df["Name"]
+    plty['Start'] = df["start_time"]
+    plty['Finish'] = df["end_time"]
+    plty["Deadline"] = df["deadline"]
+    for i, row in plty.iterrows():
+        tupe = (row['Start'], row['Finish'] - row['Start'])
+        ax_gnt.broken_barh([tupe], (i, 3), facecolors = 'tab:red' if row['Resource'] == 'Critical' else 'tab:blue')
+        ax_gnt.broken_barh([tupe], (i+1, 3), facecolors = 'white')
+
+    ax_gnt.set_yticks([ir + .5 for ir  in range(len(plty))])
+    ax_gnt.set_yticklabels(plty["Task"].to_numpy())
+
+    red_patch = mpatches.Patch(color='red', label='Task that failed to meet its deadline')
+    blue_patch = mpatches.Patch(color='blue', label='Task that met its deadline')
+
+    ax_gnt.grid(True)
+    plt.legend(handles = [red_patch, blue_patch])
+    plt.show()
+
+def main(path_to_csv = "scheduler/EDF_data.csv", TICKS = 40):
+    """
+    main function to run everything. I think this is what was wanted?
+
+    params - path_to_csv - string, the path to the csv of the data. 
+            TICKS - number, the number of ticks the scheduling algo is supposed to run for
+
+    returns - void
+    """
 
 
-critical_colors = {'Not Critical': 'rgb(0, 50, 98)', 'Critical': 'rgb(253, 181, 21)'}
+    df = pd.read_csv(path_to_csv, index_col="task-id")
+    global heap
+    heap = [] 
 
-x_seq = []
-
-for i, row in plty.iterrows():
-    tupe = (row['Start'], row['Finish'] - row['Start'])
-    x_seq.append(tupe)
-    ax_gnt.broken_barh([tupe], (i, 3), facecolors = 'tab:red' if row['Resource'] == 'Critical' else 'tab:blue')
-    ax_gnt.broken_barh([tupe], (i+1, 3), facecolors = 'white')
-    # ax_gnt.axvline(x = row["Deadline"], ymin = 0, ymax = i + 3) # Uncomment if you want lines where the deadline is
+    ex_percent = np.sum(df['exec-time-worst'] / df['period'])
+    print("this will always work if this is less than one:\t", ex_percent)
 
 
-ax_gnt.set_yticks([ir + .5 for ir  in range(len(plty))])
-ax_gnt.set_yticklabels(plty["Task"].to_numpy())
+    gantt_chart = run_scheduling(TICKS, df)
+    plot_gantt(gantt_chart)
 
-red_patch = mpatches.Patch(color='red', label='Task that failed to meet its deadline')
-blue_patch = mpatches.Patch(color='blue', label='Task that met its deadline')
-
-ax_gnt.grid(True)
-# ax_gnt.set_ylim(0, 10) # uncomment if you want greater control of the axis
-# ax_gnt.set_xlim(0, 30)
-plt.legend(handles = [red_patch, blue_patch])
-plt.show()
-
-# Plotly makes a better Gantt chart, but its only with dates, not numbers
-# fig_plotly = ff.create_gantt(plty, colors = critical_colors, index_col = 'Resource', 
-#     title = 'Gantt Chart', show_colorbar = True, bar_width = 0.4, showgrid_x=True, showgrid_y=True) 
-
-# fig_plotly.show()
-
-
+if __name__ == '__main__':
+    main()
