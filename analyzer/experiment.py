@@ -21,10 +21,8 @@ if __name__ == "__main__":
                         help="binary name, assume other files have the same name with different suffixs")
     parser.add_argument("--sid", nargs='+', type=int,
                         help='stamp id', required=False)
-    parser.add_argument("--dump", "-d", action="store_true",
+    parser.add_argument("--dump", metavar="D", type=str,
                         help="dump to certain files")
-    # parser.add_argument("--dump", metavar="D", type=str,
-    #                     help="dump to certain files")
     parser.add_argument("--quiet", "-q", action="store_true",
                         help="disable printing results")
 
@@ -46,29 +44,27 @@ if __name__ == "__main__":
 
         # get annotations
         annot_fpath = "{}.dump.annot".format(prefix)
-        (start_stamp, end_stamp) = extract_stamp(annot_fpath, stamp_id=_sid)
+        (start_stamp, end_stamp) = extract_stamp(annot_fpath, stamp_id=1)
         print("(start_stamp, end_stamp) = ", (start_stamp, end_stamp))
 
         if (start_stamp is None or
             end_stamp is None):
-            warnings.warn("cannot find magic stamp id {}".format(_sid))
-        else:
-            # parse logs with annotations
-            log_fpath = "{}.log".format(prefix)
-            logs = log_parse(log_fpath, start_stamp=start_stamp, end_stamp=end_stamp)
+            warnings.warn("cannot find magic stamp")
+            exit()
 
-            # get execution durations
-            execution_durations = get_execution_durations(logs)
+        # parse logs with annotations
+        log_fpath = "{}.log".format(prefix)
+        logs = log_parse(log_fpath, start_stamp=start_stamp, end_stamp=end_stamp)
 
-            if (args.quiet is not True):
-                print("=" * 64)
-                print("stamp id {}".format(_sid))
-                print("=" * 64)
-                print(execution_durations)
+        # get execution durations
+        execution_durations = get_execution_durations(logs)
 
-            if (args.dump is True):
-                print(args.dump)
-                dump_fpath = "{}.sid{}.pkl".format(prefix, _sid)
-                _dump_f = open(dump_fpath, "wb")
-                pickle.dump(execution_durations, _dump_f)
-                _dump_f.close()
+        if (args.quiet is not True):
+            print(execution_durations)
+
+        if (args.dump is not None):
+            print(args.dump)
+            dump_fpath = "{}.timing.pkl".format(prefix)
+            _dump_f = open(dump_fpath, "wb")
+            pickle.dump(execution_durations, _dump_f)
+            _dump_f.close()
