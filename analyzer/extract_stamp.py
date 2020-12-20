@@ -18,8 +18,9 @@ def extract_stamp(filename, stamp_id=0):
     assert type(filename) == str, TypeError
     assert type(stamp_id) == int, TypeError
 
+    print("\n\n")
     print("=" * 64)
-    print("Extracing [" + filename + "]")
+    print("Extracing [" + filename + "], seeking stamp id {}".format(stamp_id))
     print("=" * 64)
 
     _f = open(filename, "r")
