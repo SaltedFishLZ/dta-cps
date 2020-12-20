@@ -1,0 +1,3 @@
+[submodule "lf-flexpret-scripts"]
+	path = lf-flexpret-scripts
+	url = https://github.com/edwardcwang/lf-flexpret-scripts
