@@ -60,7 +60,13 @@ hello.riscv: $(wildcard ./*.c) $(wildcard $(src_dir)lib/common/*.c) $(wildcard $
 ```
 
 
-Now, we can test it with `spike`. For example, run `spike hello.riscv`, and you will get the message printed. Running the binary on a Rocket Chip emulator is similar (Note: you need to build the correct 32-bit emulator. The default binary is compiled with riscv32-unknown-elf-gcc while the default Rocket Core configuration is 64-bit).
+Now, we can test it with `spike`. For example, run `spike hello.riscv`, and you will get the message printed.
+
+Running the binary on a Rocket Chip emulator should be similar.
+
+Note:
+
+you need to build the correct 32-bit emulator. The default binary is compiled with riscv32-unknown-elf-gcc while the default Rocket Core configuration is 64-bit.
 
 
 
