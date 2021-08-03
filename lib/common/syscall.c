@@ -469,6 +469,8 @@ long atol(const char* str)
 }
 
 // Default nosys implementation of _sbrk
+// Reference: newlib
+// https://github.com/eblot/newlib/blob/master/libgloss/epiphany/sbrk.c
 void *
 _sbrk (incr)
      int incr;
