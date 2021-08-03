@@ -8,7 +8,7 @@
 ## Quickstart
 
 
-## Hardware Spec
+## Hardware
 
 ### Memory Map
 
@@ -22,14 +22,13 @@
         80000000 - 90000000  RWXC memory@80000000
 ```
 
+## RTL-based Cycle-level Emulator
 
+### Build Rocket Emulators
 
-## Using GDB on emulators
+* Download the modified rocket-chip repo: https://github.com/SaltedFishLZ/rocket-chip
+* Use `CONFIG=DefaultRV32Config` to build a default 32-bit Rocket system (Please check `rocket-chip/src/main/scala/system/Configs.scala`)
 
+### Using GDB on Emulators
 
-
-
-## Authors
-
-Shaokai Lin, Zheng Liang, Ethan Hick, Josephine Wen
 
