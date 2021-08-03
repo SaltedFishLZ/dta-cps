@@ -1,0 +1,12 @@
+# binary
+*.riscv
+
+# dumped asm
+*.dump
+*.dump.annot
+
+# log files
+*.log
+
+# python dumped files
+*.pkl

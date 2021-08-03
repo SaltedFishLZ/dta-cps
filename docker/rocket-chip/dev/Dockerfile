@@ -1,0 +1,104 @@
+FROM ubuntu:18.04
+
+ARG NCORES=16
+
+# basic packages
+# TODO: config apt source according to IP location
+# some distributions may not come with `sudo`
+# `sudo` will be installled later
+ARG IP_LOCATION="US"
+
+RUN apt-get update && \
+    apt-get install -yqq sudo && \
+    apt-get install -yqq --no-install-recommends apt-utils && \
+    apt-get install -yqq vim git curl wget unzip autoconf gawk && \
+    apt-get install locales && \
+    apt-get update && \
+    locale-gen C.UTF-8 || true
+
+# set up locale
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+
+# chipyard ubuntu dependencies
+# this part comes from the Chipyard tutorial
+RUN sudo apt-get install -yqq autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev && \
+    sudo apt-get install -yqq libusb-1.0-0-dev gawk build-essential bison flex texinfo gperf libtool && \
+    sudo apt-get install -yqq patchutils bc zlib1g-dev device-tree-compiler pkg-config && \
+    sudo apt-get install -yqq libexpat-dev libfl-dev && \
+    sudo apt-get install -yqq build-essential bison flex libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev && \
+    sudo apt-get install -yqq gcc-5 g++-5 openjdk-8-jre openjdk-8-jdk python python3 && \
+    echo "need to install apt-transport-https for some distributions. Sbt needs it" && \
+    sudo apt-get install -yqq apt-transport-https ca-certificates && \
+    sudo apt-get install -yqq texinfo gengetopt libexpat1-dev libusb-dev libncurses5-dev cmake perl-doc && \
+    sudo apt-get install -yqq python3.6 patch diffstat texi2html texinfo subversion chrpath && \
+    sudo apt-get install -yqq device-tree-compiler && \
+    sudo apt-get update && \
+    echo "install sbt: https://www.scala-sbt.org/release/docs/Installing-sbt-on-Linux.html" && \
+    echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list && \
+    curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add && \
+    sudo apt-get update && \
+    sudo apt-get install -yqq sbt
+
+
+
+
+# download and install verilator
+ARG VERILATOR_USE_LOCAL_PACKAGE
+ARG VERILATOR_VERSION=4.008
+ARG FOLDER=downloads
+
+WORKDIR /
+RUN sudo mkdir -p ${FOLDER} && \
+    sudo chmod -R 777 ${FOLDER} && \
+    cd ${FOLDER} && \
+    curl -LO https://www.veripool.org/ftp/verilator-${VERILATOR_VERSION}.tgz && \
+    tar -xvzf verilator-${VERILATOR_VERSION}.tgz && \
+    cd verilator-${VERILATOR_VERSION} && \
+    autoconf && ./configure && \
+    make -j${NCORES} && \
+    make test && \
+    sudo make install
+
+
+
+
+
+# ---------------------------------------------------------------- #
+# rocket
+# ---------------------------------------------------------------- #
+
+# download rocket-tools
+ARG REPO_OWNER=saltedfishlz
+ARG REPO_NAME=rocket-tools
+ENV RISCV=/opt/riscv
+ENV PATH=${RISCV}/bin:${PATH}
+
+WORKDIR /
+RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
+    cd ${REPO_NAME} && \
+    git submodule update --init --recursive && \
+    export RISCV=$RISCV && \
+    export MAKEFLAGS=-j${NCORES} && \
+    ./build.sh && \
+    ./build-rv32ima.sh
+
+
+# download rocket-chip
+# release 1.2
+ARG REPO_OWNER=saltedfishlz
+ARG REPO_NAME=rocket-chip
+ENV ROCKET=/rocket-chip
+
+WORKDIR /
+RUN git clone https://github.com/${REPO_OWNER}/${REPO_NAME}.git && \
+    cd ${REPO_NAME} && \
+    git submodule update --init --recursive && \
+    git checkout master && \
+    cd emulator && \
+    make -j${NCORES} CONFIG=DefaultRV32Config && \
+    make -j${NCORES} CONFIG=DefaultRV32Config run-asm-tests && \
+    make -j${NCORES} CONFIG=DefaultRV32Config run-bmark-tests && \
+    make -j${NCORES} CONFIG=DefaultRV32Config debug; \
+    make clean
